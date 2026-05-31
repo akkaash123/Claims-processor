@@ -32,7 +32,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+@app.get("/")
+async def health_check():
+    return {
+        "status": "online", 
+        "system": "Plum Claims Processor AI Pipeline", 
+        "version": "1.0.0"
+    }
 class VerifyRequest(BaseModel):
     member_id: str
     policy_id: str
