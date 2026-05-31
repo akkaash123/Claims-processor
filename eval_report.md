@@ -1,5 +1,5 @@
 # Plum AI Claims Processor - Eval Report
-**Generated:** 2026-05-31 11:59:51
+**Generated:** 2026-05-31 20:03:42
 **Total Cases:** 12
 
 ---
@@ -46,8 +46,9 @@
     "Missing required document: HOSPITAL_BILL. You uploaded: PRESCRIPTION."
   ],
   "fraud_flags": [],
-  "decision": null,
+  "decision": "REJECTED",
   "notes": "Missing required document: HOSPITAL_BILL. You uploaded: PRESCRIPTION.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -61,7 +62,7 @@
 }
 ```
 
-**Execution Time:** 0.01 seconds
+**Execution Time:** 0.02 seconds
 ---
 
 ## TC002: Unreadable Document
@@ -82,11 +83,49 @@
 ### Actual System Output (With Trace)
 ```json
 {
-  "detail": "'NoneType' object has no attribute 'matched_waiting_period_category'"
+  "member_id": "EMP004",
+  "policy_id": "PLUM_GHI_2024",
+  "claim_category": "PHARMACY",
+  "treatment_date": "2024-10-25",
+  "claimed_amount": 800.0,
+  "documents": [
+    {
+      "file_id": "F003",
+      "file_name": "prescription.jpg",
+      "actual_type": "PRESCRIPTION",
+      "quality": "GOOD"
+    },
+    {
+      "file_id": "F004",
+      "file_name": "blurry_bill.jpg",
+      "actual_type": "PHARMACY_BILL",
+      "quality": "UNREADABLE"
+    }
+  ],
+  "claims_history": [],
+  "simulate_component_failure": false,
+  "stop_pipeline": true,
+  "validation_errors": [
+    "The document blurry_bill.jpg is blurry or unreadable. Please re-upload."
+  ],
+  "fraud_flags": [],
+  "decision": "REJECTED",
+  "notes": "The document blurry_bill.jpg is blurry or unreadable. Please re-upload.",
+  "confidence_score": 0.95,
+  "audit_trace": [
+    {
+      "node": "bouncer",
+      "status": "FAILED"
+    },
+    {
+      "node": "synthesizer",
+      "status": "FINALIZED"
+    }
+  ]
 }
 ```
 
-**Execution Time:** 0.01 seconds
+**Execution Time:** 0.00 seconds
 ---
 
 ## TC003: Documents Belong to Different Patients
@@ -130,11 +169,12 @@
   "simulate_component_failure": false,
   "stop_pipeline": true,
   "validation_errors": [
-    "Documents belong to different patients: Arjun Mehta, Rajesh Kumar."
+    "Documents belong to different patients: Rajesh Kumar, Arjun Mehta."
   ],
   "fraud_flags": [],
-  "decision": null,
-  "notes": "Documents belong to different patients: Arjun Mehta, Rajesh Kumar.",
+  "decision": "REJECTED",
+  "notes": "Documents belong to different patients: Rajesh Kumar, Arjun Mehta.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -271,9 +311,10 @@
       "approved_amt": 180.0
     }
   ],
-  "decision": "PARTIAL",
+  "decision": "APPROVED",
   "rejection_reasons": [],
   "notes": "Co-pay (10%) applied.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -290,7 +331,7 @@
     {
       "node": "policy_math",
       "status": "COMPLETED",
-      "result": "PARTIAL"
+      "result": "APPROVED"
     },
     {
       "node": "synthesizer",
@@ -300,7 +341,7 @@
 }
 ```
 
-**Execution Time:** 8.13 seconds
+**Execution Time:** 5.08 seconds
 ---
 
 ## TC005: Waiting Period — Diabetes
@@ -382,7 +423,7 @@
       }
     ],
     "total_amount": 3000.0,
-    "quality_flag": "GOOD",
+    "quality_flag": "LOW_CONFIDENCE",
     "alteration_detected": false
   },
   "fraud_flags": [],
@@ -404,6 +445,7 @@
     "WAITING_PERIOD"
   ],
   "notes": "Treatment for diabetes requires a 90-day waiting period. Member is at 44 days. Co-pay (10%) applied.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -430,7 +472,7 @@
 }
 ```
 
-**Execution Time:** 10.33 seconds
+**Execution Time:** 13.75 seconds
 ---
 
 ## TC006: Dental Partial Approval — Cosmetic Exclusion
@@ -503,7 +545,7 @@
         "description": "Teeth Whitening",
         "amount": 4000.0,
         "is_policy_excluded": true,
-        "exclusion_reason": "Teeth whitening"
+        "exclusion_reason": "Teeth whitening is a globally excluded treatment."
       }
     ],
     "total_amount": 12000.0,
@@ -521,7 +563,7 @@
     {
       "item": "Teeth Whitening",
       "status": "REJECTED",
-      "reason": "Teeth whitening"
+      "reason": "Teeth whitening is a globally excluded treatment."
     }
   ],
   "decision": "REJECTED",
@@ -530,6 +572,7 @@
     "EXCLUDED_CONDITION"
   ],
   "notes": "Claimed amount \u20b912000.0 exceeds the universal per-claim limit of \u20b95000.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -556,7 +599,7 @@
 }
 ```
 
-**Execution Time:** 5.68 seconds
+**Execution Time:** 5.38 seconds
 ---
 
 ## TC007: MRI Without Pre-Authorization
@@ -656,10 +699,11 @@
   ],
   "decision": "REJECTED",
   "rejection_reasons": [
-    "PER_CLAIM_EXCEEDED",
-    "WAITING_PERIOD"
+    "WAITING_PERIOD",
+    "PER_CLAIM_EXCEEDED"
   ],
   "notes": "Treatment for hernia requires a 365-day waiting period. Member is at 215 days. Claimed amount \u20b915000.0 exceeds the universal per-claim limit of \u20b95000.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -686,7 +730,7 @@
 }
 ```
 
-**Execution Time:** 6.49 seconds
+**Execution Time:** 6.14 seconds
 ---
 
 ## TC008: Per-Claim Limit Exceeded
@@ -798,6 +842,7 @@
     "PER_CLAIM_EXCEEDED"
   ],
   "notes": "Claimed amount \u20b97500.0 exceeds the universal per-claim limit of \u20b95000. Co-pay (10%) applied.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -824,7 +869,7 @@
 }
 ```
 
-**Execution Time:** 6.14 seconds
+**Execution Time:** 3.99 seconds
 ---
 
 ## TC009: Fraud Signal — Multiple Same-Day Claims
@@ -895,6 +940,7 @@
   ],
   "decision": "MANUAL_REVIEW",
   "notes": "Unusual same-day claim pattern detected.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -912,7 +958,7 @@
 }
 ```
 
-**Execution Time:** 0.00 seconds
+**Execution Time:** 0.01 seconds
 ---
 
 ## TC010: Network Hospital — Discount Applied
@@ -1023,7 +1069,8 @@
   ],
   "decision": "PARTIAL",
   "rejection_reasons": [],
-  "notes": "Network discount (20%) applied first. Co-pay (10%) applied. Payout gracefully capped at \u20b92000 due to policy limits (Category Limit: \u20b92000, Per-Claim Limit: \u20b95000).",
+  "notes": "Network discount (20%) applied first. Co-pay (10%) applied. Payout gracefully capped at \u20b92000 due to policy limits.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -1050,7 +1097,7 @@
 }
 ```
 
-**Execution Time:** 5.72 seconds
+**Execution Time:** 7.07 seconds
 ---
 
 ## TC011: Component Failure — Graceful Degradation
@@ -1109,7 +1156,7 @@
   ],
   "claims_history": [],
   "simulate_component_failure": true,
-  "stop_pipeline": false,
+  "stop_pipeline": true,
   "validation_errors": [],
   "extracted_data": {
     "actual_type": "UNKNOWN",
@@ -1128,16 +1175,13 @@
     "alteration_detected": false
   },
   "fraud_flags": [],
-  "approved_amount": 0.0,
-  "itemized_breakdown": [],
   "decision": "MANUAL_REVIEW",
-  "rejection_reasons": [],
-  "notes": "Routed to manual review due to incomplete AI extraction (System Degraded).",
+  "notes": "Extractor component failed. Proceeding with degraded state. Routed to manual review due to incomplete AI extraction (System Degraded).",
   "confidence_score": 0.4,
   "audit_trace": [
     {
       "node": "bouncer",
-      "status": "PASSED"
+      "status": "BYPASSED_DUE_TO_FAILURE"
     },
     {
       "node": "fraud",
@@ -1146,11 +1190,6 @@
     {
       "node": "extractor",
       "status": "DEGRADED"
-    },
-    {
-      "node": "policy_math",
-      "status": "COMPLETED",
-      "result": "REJECTED"
     },
     {
       "node": "synthesizer",
@@ -1219,7 +1258,7 @@
   "stop_pipeline": false,
   "validation_errors": [],
   "extracted_data": {
-    "actual_type": "PRESCRIPTION",
+    "actual_type": "UNKNOWN",
     "patient_name_on_doc": null,
     "doctor_name": "Dr. P. Banerjee",
     "doctor_registration": "WB/34567/2015",
@@ -1263,11 +1302,12 @@
   ],
   "decision": "REJECTED",
   "rejection_reasons": [
-    "PER_CLAIM_EXCEEDED",
     "WAITING_PERIOD",
-    "EXCLUDED_CONDITION"
+    "EXCLUDED_CONDITION",
+    "PER_CLAIM_EXCEEDED"
   ],
   "notes": "Treatment for obesity treatment requires a 365-day waiting period. Member is at 200 days. Claimed amount \u20b98000.0 exceeds the universal per-claim limit of \u20b95000.",
+  "confidence_score": 0.95,
   "audit_trace": [
     {
       "node": "bouncer",
@@ -1294,5 +1334,5 @@
 }
 ```
 
-**Execution Time:** 7.08 seconds
+**Execution Time:** 5.89 seconds
 ---
